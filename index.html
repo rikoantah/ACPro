@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AC PRO</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f1f5f9;
+color:#0f172a;
+}
+
+.hero{
+background:linear-gradient(135deg,#0284c7,#0f172a);
+color:white;
+padding:60px 20px;
+text-align:center;
+}
+
+.hero h1{
+font-size:48px;
+font-weight:bold;
+}
+
+.hero p{
+margin-top:10px;
+font-size:18px;
+opacity:.95;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+padding:20px;
+}
+
+.form-card{
+background:white;
+padding:25px;
+border-radius:20px;
+margin-top:-40px;
+box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+input{
+width:100%;
+padding:14px;
+border:1px solid #cbd5e1;
+border-radius:12px;
+margin-bottom:15px;
+font-size:15px;
+}
+
+.section-title{
+font-size:18px;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+.services{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:12px;
+margin-bottom:20px;
+}
+
+.service-card{
+background:#f8fafc;
+border:2px solid #e2e8f0;
+border-radius:15px;
+padding:15px;
+cursor:pointer;
+transition:.3s;
+}
+
+.service-card.active{
+border-color:#0284c7;
+background:#e0f2fe;
+}
+
+.service-name{
+font-weight:bold;
+margin-bottom:5px;
+}
+
+.service-price{
+color:#0284c7;
+font-weight:bold;
+}
+
+.submit-btn{
+width:100%;
+padding:16px;
+border:none;
+border-radius:15px;
+background:#0284c7;
+color:white;
+font-size:16px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.submit-btn:hover{
+opacity:.95;
+}
+
+.loading{
+display:none;
+text-align:center;
+padding:20px;
+}
+
+.success{
+display:none;
+text-align:center;
+padding:25px;
+}
+
+.success h2{
+color:#22c55e;
+margin-bottom:10px;
+}
+
+.wa-btn{
+display:inline-block;
+margin-top:15px;
+padding:14px 20px;
+background:#22c55e;
+color:white;
+text-decoration:none;
+border-radius:12px;
+font-weight:bold;
+}
+
+.floating-wa{
+position:fixed;
+right:20px;
+bottom:20px;
+width:60px;
+height:60px;
+background:#22c55e;
+border-radius:50%;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
+color:white;
+text-decoration:none;
+box-shadow:0 5px 15px rgba(0,0,0,.3);
+z-index:999;
+}
+
+.footer{
+text-align:center;
+padding:30px;
+color:#64748b;
+}
+
+@media(max-width:768px){
+
+.hero{
+padding:50px 15px;
+}
+
+.hero h1{
+font-size:36px;
+}
+
+.hero p{
+font-size:16px;
+}
+
+.form-card{
+margin-top:-30px;
+padding:20px;
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="hero">
+
+<h1>❄ AC PRO</h1>
+
+<p>
+Servis AC Pontianak
+</p>
+
+<p style="margin-top:15px;">
+✓ Cuci AC<br>
+✓ Isi Freon<br>
+✓ Bongkar Pasang<br>
+✓ Perbaikan AC
+</p>
+
+</div>
+
+<div class="container">
+
+<div class="form-card">
+
+<div id="formArea">
+
+<div class="section-title">
+Pesan Sekarang
+</div>
+
+<input
+type="text"
+id="nama"
+placeholder="Nama Lengkap">
+
+<input
+type="text"
+id="hp"
+placeholder="Nomor WhatsApp">
+
+<input
+type="text"
+id="alamat"
+placeholder="Alamat">
+
+<div class="section-title">
+Pilih Layanan
+</div>
+
+<div
+id="services"
+class="services">
+</div>
+
+<button
+class="submit-btn"
+onclick="kirimPesanan()">
+
+KIRIM PESANAN
+
+</button>
+
+</div>
+
+<div
+id="loading"
+class="loading">
+
+<h3>Mengirim Pesanan...</h3>
+
+</div>
+
+<div
+id="success"
+class="success">
+
+<h2>✓ Pesanan Berhasil</h2>
+
+<p>
+Tim AC PRO akan segera menghubungi Anda.
+</p>
+
+<a
+class="wa-btn"
+id="waLink"
+target="_blank">
+
+Chat WhatsApp
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+AC PRO<br>
+
+☎ 085171689768
+
+</div>
+
+<a
+href="https://wa.me/6285171689768"
+target="_blank"
+class="floating-wa">
+
+💬
+
+</a>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwakFYqjrmfgJ7YB_VNfQ1ZMuvxwlUrKD8sLT1n9o-lti3TLVDLaAjgv0aYQVNANNk7/exec";
+
+let selectedServices=[];
+
+async function loadServices(){
+
+try{
+
+const res=
+await fetch(
+API_URL + "?action=layanan"
+);
+
+const data=
+await res.json();
+
+const container=
+document.getElementById("services");
+
+container.innerHTML="";
+
+data.forEach(item=>{
+
+const card=
+document.createElement("div");
+
+card.className="service-card";
+
+card.innerHTML=`
+<div class="service-name">
+${item.nama}
+</div>
+
+<div class="service-price">
+Rp ${Number(item.harga).toLocaleString('id-ID')}
+</div>
+`;
+
+card.onclick=()=>{
+
+card.classList.toggle("active");
+
+if(
+selectedServices.includes(item.nama)
+){
+
+selectedServices=
+selectedServices.filter(
+x=>x!==item.nama
+);
+
+}else{
+
+selectedServices.push(item.nama);
+
+}
+
+};
+
+container.appendChild(card);
+
+});
+
+}catch(err){
+
+alert("Gagal memuat layanan");
+
+}
+
+}
+
+loadServices();
+
+async function kirimPesanan(){
+
+const nama=
+document.getElementById("nama").value.trim();
+
+const hp=
+document.getElementById("hp").value.trim();
+
+const alamat=
+document.getElementById("alamat").value.trim();
+
+if(!nama){
+alert("Nama wajib diisi");
+return;
+}
+
+if(!hp){
+alert("Nomor HP wajib diisi");
+return;
+}
+
+if(!alamat){
+alert("Alamat wajib diisi");
+return;
+}
+
+if(selectedServices.length===0){
+alert("Pilih minimal 1 layanan");
+return;
+}
+
+document
+.getElementById("formArea")
+.style.display="none";
+
+document
+.getElementById("loading")
+.style.display="block";
+
+try{
+
+const payload={
+
+nama:nama,
+
+hp:hp,
+
+alamat:alamat,
+
+layanan:selectedServices
+
+};
+
+const res=
+await fetch(
+API_URL,
+{
+method:"POST",
+body:JSON.stringify(payload)
+}
+);
+
+const result=
+await res.json();
+
+document
+.getElementById("loading")
+.style.display="none";
+
+if(result.success){
+
+document
+.getElementById("success")
+.style.display="block";
+
+const pesan=
+`Halo AC PRO
+
+Nama : ${nama}
+HP : ${hp}
+Alamat : ${alamat}
+
+Layanan :
+${selectedServices.join(", ")}`;
+
+document
+.getElementById("waLink")
+.href=
+"https://wa.me/6285171689768?text="
++
+encodeURIComponent(pesan);
+
+}else{
+
+alert(result.message);
+
+location.reload();
+
+}
+
+}catch(err){
+
+alert("Gagal mengirim pesanan");
+
+location.reload();
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
